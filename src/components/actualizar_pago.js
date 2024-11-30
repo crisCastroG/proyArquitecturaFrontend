@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "./actualizar_pago.css";
 
 const PagarCuota = () => {
   const [idDepto, setIdDepto] = useState("");
@@ -8,17 +9,13 @@ const PagarCuota = () => {
   const handlePagarCuota = async (e) => {
     e.preventDefault();
 
-    // Validaciones simples
     if (!idDepto || !fechaAPagar) {
       setMensaje("Todos los campos son obligatorios");
       return;
     }
 
     try {
-      // Obtener fecha actual en formato YYYY-MM-DD
       const fechaPago = new Date().toISOString().split("T")[0];
-
-      // Endpoint dinámico
       const url = `http://127.0.0.1:5000/pagar_cuota/${idDepto}/${fechaAPagar}/${fechaPago}`;
 
       const response = await fetch(url, {
@@ -42,30 +39,47 @@ const PagarCuota = () => {
   };
 
   return (
-    <div>
-      <h2>Pagar Cuota</h2>
-      <form onSubmit={handlePagarCuota}>
-        <div>
-          <label>ID Departamento:</label>
+    <div className="container">
+      {/* Header */}
+      <header className="header">
+        <h1>Pagar Cuota</h1>
+      </header>
+
+      {/* Formulario */}
+      <form className="form" onSubmit={handlePagarCuota}>
+        <div className="form-group">
+          <label htmlFor="idDepto">ID Departamento:</label>
           <input
+            id="idDepto"
             type="number"
             value={idDepto}
             onChange={(e) => setIdDepto(e.target.value)}
+            placeholder="Ingrese el ID del departamento"
             required
           />
         </div>
-        <div>
-          <label>Fecha a Pagar (YYYY-MM-DD):</label>
+        <div className="form-group">
+          <label htmlFor="fechaAPagar">Fecha a Pagar:</label>
           <input
+            id="fechaAPagar"
             type="date"
             value={fechaAPagar}
             onChange={(e) => setFechaAPagar(e.target.value)}
             required
           />
         </div>
-        <button type="submit">Registrar Pago</button>
+        <button type="submit" className="btn">
+          Registrar Pago
+        </button>
       </form>
-      {mensaje && <p>{mensaje}</p>}
+
+      {/* Mensaje */}
+      {mensaje && <p className="mensaje">{mensaje}</p>}
+
+      {/* Footer */}
+      <footer className="footer">
+        <p className="letras">© 2024 Gestión de Departamentos. Todos los derechos reservados.</p>
+      </footer>
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "./listar_pagos_pendientes.css";
 
 const ListarPendientes = () => {
   const [mes, setMes] = useState("");
@@ -8,12 +9,12 @@ const ListarPendientes = () => {
 
   const listarPagosPendientes = async (e) => {
     e.preventDefault();
-  
+
     if (!mes || !anio) {
       setMensaje("Todos los campos son obligatorios");
       return;
     }
-  
+
     try {
       const url = `http://127.0.0.1:5000/pagos_pendientes/${mes}/${anio}`;
       const response = await fetch(url, {
@@ -22,12 +23,12 @@ const ListarPendientes = () => {
           "Content-Type": "application/json",
         },
       });
-  
+
       if (response.ok) {
         const data = await response.json();
-        const departamentos = data.departamentos; // Acceder a la propiedad 'departamentos'
-  
-        setPagosPendientes(departamentos); // Almacenar los datos en el estado
+        const departamentos = data.departamentos;
+
+        setPagosPendientes(departamentos);
         setMensaje(`Se encontraron ${departamentos.length} pagos pendientes.`);
       } else {
         const errorData = await response.json();
@@ -40,12 +41,18 @@ const ListarPendientes = () => {
   };
 
   return (
-    <div>
-      <h2>Pagos Pendientes</h2>
-      <form onSubmit={listarPagosPendientes}>
-        <div>
-          <label>Mes (MM):</label>
+    <div className="container">
+      {/* Header */}
+      <header className="header">
+        <h1>Pagos Pendientes</h1>
+      </header>
+
+      {/* Formulario */}
+      <form className="form" onSubmit={listarPagosPendientes}>
+        <div className="form-group">
+          <label htmlFor="mes">Mes (MM):</label>
           <input
+            id="mes"
             type="number"
             value={mes}
             onChange={(e) => setMes(e.target.value)}
@@ -55,9 +62,10 @@ const ListarPendientes = () => {
             placeholder="MM"
           />
         </div>
-        <div>
-          <label>Año (YYYY):</label>
+        <div className="form-group">
+          <label htmlFor="anio">Año (YYYY):</label>
           <input
+            id="anio"
             type="number"
             value={anio}
             onChange={(e) => setAnio(e.target.value)}
@@ -66,21 +74,25 @@ const ListarPendientes = () => {
             placeholder="YYYY"
           />
         </div>
-        <button type="submit">Generar Listado</button>
+        <button type="submit" className="btn">
+          Generar Listado
+        </button>
       </form>
 
-      {mensaje && <p>{mensaje}</p>}
+      {/* Mensaje */}
+      {mensaje && <p className="mensaje">{mensaje}</p>}
 
+      {/* Tabla */}
       {pagosPendientes.length > 0 && (
-        <div>
+        <div className="table-container">
           <h3>Listado de Pagos Pendientes</h3>
-          <table border="1">
+          <table className="table">
             <thead>
               <tr>
-                <th>Piso departamento</th>
-                <th>Numero departamento</th>
-                <th>Fecha a pagar</th>
-                <th>Monto a pagar</th>
+                <th>Piso Departamento</th>
+                <th>Número Departamento</th>
+                <th>Fecha a Pagar</th>
+                <th>Monto a Pagar</th>
               </tr>
             </thead>
             <tbody>
@@ -96,6 +108,11 @@ const ListarPendientes = () => {
           </table>
         </div>
       )}
+
+      {/* Footer */}
+      <footer className="footer">
+        <p className="letras">© 2024 Gestión de Departamentos. Todos los derechos reservados.</p>
+      </footer>
     </div>
   );
 };
