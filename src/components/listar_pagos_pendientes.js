@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import "./listar_pagos_pendientes.css";
 
 const ListarPendientes = () => {
-  const [mes, setMes] = useState("");
-  const [anio, setAnio] = useState("");
-  const [pagosPendientes, setPagosPendientes] = useState([]);
-  const [mensaje, setMensaje] = useState("");
+  let [mes, setMes] = useState("");
+  let [anio, setAnio] = useState("");
+  let [pagosPendientes, setPagosPendientes] = useState([]);
+  let [mensaje, setMensaje] = useState("");
 
-  const listarPagosPendientes = async (e) => {
+  let listarPagosPendientes = async (e) => {
     e.preventDefault();
 
     if (!mes || !anio) {
@@ -16,8 +16,8 @@ const ListarPendientes = () => {
     }
 
     try {
-      const url = `http://127.0.0.1:5000/pagos_pendientes/${mes}/${anio}`;
-      const response = await fetch(url, {
+      let url = `http://127.0.0.1:5000/pagos_pendientes/${mes}/${anio}`;
+      let response = await fetch(url, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -25,13 +25,13 @@ const ListarPendientes = () => {
       });
 
       if (response.ok) {
-        const data = await response.json();
-        const departamentos = data.departamentos;
+        let data = await response.json();
+        let departamentos = data.departamentos || [];
 
         setPagosPendientes(departamentos);
         setMensaje(`Se encontraron ${departamentos.length} pagos pendientes.`);
       } else {
-        const errorData = await response.json();
+        let errorData = await response.json();
         setMensaje(`Error al obtener los pagos pendientes: ${errorData.titulo}`);
       }
     } catch (error) {
@@ -39,6 +39,7 @@ const ListarPendientes = () => {
       setMensaje("Error al conectar con la API");
     }
   };
+  
 
   return (
     <div className="container">
@@ -85,9 +86,10 @@ const ListarPendientes = () => {
       {/* Tabla */}
       {pagosPendientes.length > 0 && (
         <div className="table-container">
-          <h3>Listado de Pagos Pendientes</h3>
-          <table className="table">
-            <thead>
+        <h1>Pagos Pendientes</h1>
+        <p>{mensaje}</p>
+        <table className="table">
+        <thead>
               <tr>
                 <th>Piso Departamento</th>
                 <th>Número Departamento</th>
@@ -105,8 +107,8 @@ const ListarPendientes = () => {
                 </tr>
               ))}
             </tbody>
-          </table>
-        </div>
+        </table>
+      </div>
       )}
 
       {/* Footer */}

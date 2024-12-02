@@ -2,11 +2,17 @@ import React, { useState } from "react";
 import "./actualizar_pago.css";
 
 const PagarCuota = () => {
-  const [idDepto, setIdDepto] = useState("");
-  const [fechaAPagar, setFechaAPagar] = useState("");
-  const [mensaje, setMensaje] = useState("");
+  let [idDepto, setIdDepto] = useState("");
+  let [fechaAPagar, setFechaAPagar] = useState("");
+  let [mensaje, setMensaje] = useState("");
+  let [numeroDepto, setNumeroDepto] = useState("");  
+  let [fechaPago, setFechaPago] = useState("");
+  let [periodoPagado, setPeriodoPagado] = useState("");
+  let [estadoTransaccion, setEstadoTransaccion] = useState("");
 
-  const handlePagarCuota = async (e) => {
+  let datosExistentes = numeroDepto + fechaPago + periodoPagado + estadoTransaccion;
+
+  let pagarCuota = async (e) => {
     e.preventDefault();
 
     if (!idDepto || !fechaAPagar) {
@@ -15,10 +21,10 @@ const PagarCuota = () => {
     }
 
     try {
-      const fechaPago = new Date().toISOString().split("T")[0];
-      const url = `http://127.0.0.1:5000/pagar_cuota/${idDepto}/${fechaAPagar}/${fechaPago}`;
+      let fechaPago = new Date().toISOString().split("T")[0];
+      let url = `http://127.0.0.1:5000/pagar_cuota/${idDepto}/${fechaAPagar}/${fechaPago}`;
 
-      const response = await fetch(url, {
+      let response = await fetch(url, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -26,10 +32,19 @@ const PagarCuota = () => {
       });
 
       if (response.ok) {
-        const data = await response.json();
-        setMensaje(`Pago registrado exitosamente: ${JSON.stringify(data)}`);
+        let respuesta = await response.json();
+        if(JSON.stringify(respuesta).includes("No existen")){
+          setMensaje(`No existen pagos para este departamento o fecha`);
+        } else {
+          setMensaje(`Pago registrado exitosamente:`);
+          setNumeroDepto(respuesta.numero_depto);
+          setPeriodoPagado(respuesta.periodo_pagado);
+          setFechaPago(respuesta.fechaPago);
+          setEstadoTransaccion(respuesta.estado_transaccion);
+        }
+
       } else {
-        const errorData = await response.json();
+        let errorData = await response.json();
         setMensaje(`Error al registrar el pago: ${errorData.message}`);
       }
     } catch (error) {
@@ -46,7 +61,7 @@ const PagarCuota = () => {
       </header>
 
       {/* Formulario */}
-      <form className="form" onSubmit={handlePagarCuota}>
+      <form className="form" onSubmit={pagarCuota}>
         <div className="form-group">
           <label htmlFor="idDepto">ID Departamento:</label>
           <input
@@ -75,6 +90,17 @@ const PagarCuota = () => {
 
       {/* Mensaje */}
       {mensaje && <p className="mensaje">{mensaje}</p>}
+      {datosExistentes ? (       
+      <div className="center-container">
+      <div className="card">
+        <h3>Detalles del Pago</h3>
+        <p>Número de Departamento: {numeroDepto}</p>
+        <p>Fecha de Pago: {fechaPago}</p>
+        <p>Periodo Pagado: {periodoPagado}</p>
+        <p>Estado de Transacción: {estadoTransaccion}</p>
+      </div>
+      </div>):<span></span>}
+
 
       {/* Footer */}
       <footer className="footer">

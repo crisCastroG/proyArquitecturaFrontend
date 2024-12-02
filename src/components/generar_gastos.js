@@ -18,13 +18,20 @@ function GenerarGastos() {
     try {
       let response = await fetch(`http://127.0.0.1:5000/generar_gastos/${mes}/${anio}`);
 
-      if (!response.ok) {
-        throw new Error("Error al obtener los datos.");
-      }
+      if (response.ok) {
+        let data = await response.json();
+        let departamentos = data.departamentos || [];
 
-      const data = await response.json();
-      setResultado(data);
-      setError("");
+        setResultado(departamentos);
+        if (departamentos.length === 0) {
+          setError("No se encontraron gastos para generar");
+        } else {
+          setError("");
+        }
+      } else {
+        let errorData = await response.json();
+        setError(`Error al generar gastos: ${errorData.titulo}`);
+      }
     } catch (error) {
       setError(error.message);
     }
@@ -46,6 +53,7 @@ function GenerarGastos() {
             type="number"
             min="1"
             max="12"
+            required
             value={mes}
             onChange={(e) => setMes(e.target.value)}
             placeholder="Ejemplo: 6"
@@ -58,6 +66,7 @@ function GenerarGastos() {
             type="number"
             min="2000"
             max="2100"
+            required
             value={anio}
             onChange={(e) => setAnio(e.target.value)}
             placeholder="Ejemplo: 2024"
@@ -76,17 +85,21 @@ function GenerarGastos() {
           <table className="table">
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Descripción</th>
-                <th>Monto</th>
+                <th>Piso</th>
+                <th>Número de Departamento</th>
+                <th>Pago Agua</th>
+                <th>Pago Luz</th>
+                <th>Total a Pagar</th>
               </tr>
             </thead>
             <tbody>
               {resultado.map((gasto, index) => (
                 <tr key={index}>
-                  <td>{gasto.id}</td>
-                  <td>{gasto.descripcion}</td>
-                  <td>${gasto.monto}</td>
+                  <td>{gasto.piso_depto}</td>
+                  <td>{gasto.numero_depto}</td>
+                  <td>{gasto.pagoAgua.toFixed(0)}</td>
+                  <td>{gasto.pagoLuz.toFixed(0)}</td>
+                  <td>{gasto.totalPorPagar.toFixed(0)}</td>
                 </tr>
               ))}
             </tbody>
